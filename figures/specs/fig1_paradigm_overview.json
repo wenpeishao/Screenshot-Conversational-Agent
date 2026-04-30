@@ -1,0 +1,50 @@
+{
+  "canvas": {"width": 900, "height": 520},
+  "nodes": [
+    {"id": "messages", "label": "Text Messages\n(50-13K per person)", "x": 110, "y": 75, "width": 150, "height": 55, "shape": "rounded", "fill": "#FEF3C7", "stroke": "#F59E0B", "text_color": "#92400E"},
+
+    {"id": "lora_train", "label": "LoRA\nFine-Tuning", "x": 330, "y": 75, "width": 130, "height": 55, "shape": "rounded", "fill": "#DBEAFE", "stroke": "#3B82F6", "text_color": "#1E40AF"},
+
+    {"id": "adapter", "label": "Per-Person\nLoRA Adapter", "x": 550, "y": 75, "width": 140, "height": 55, "shape": "rounded", "fill": "#DBEAFE", "stroke": "#3B82F6", "text_color": "#1E40AF"},
+
+    {"id": "base_model", "label": "Qwen3-8B\n(Base Model)", "x": 750, "y": 75, "width": 140, "height": 55, "shape": "rect", "fill": "#E5E7EB", "stroke": "#6B7280", "text_color": "#374151"},
+
+    {"id": "agent", "label": "Per-Person\nAgent", "x": 650, "y": 195, "width": 130, "height": 50, "shape": "rounded", "fill": "#DBEAFE", "stroke": "#3B82F6", "text_color": "#1E40AF"},
+
+    {"id": "probe_neutral", "label": "Neutral\nAcquaintance", "x": 100, "y": 280, "width": 115, "height": 45, "shape": "rounded", "fill": "#D1FAE5", "stroke": "#10B981", "text_color": "#065F46", "font_size": 12},
+    {"id": "probe_therapist", "label": "Supportive\nTherapist", "x": 240, "y": 280, "width": 115, "height": 45, "shape": "rounded", "fill": "#D1FAE5", "stroke": "#10B981", "text_color": "#065F46", "font_size": 12},
+    {"id": "probe_reject", "label": "Rejecting\nPeer", "x": 380, "y": 280, "width": 115, "height": 45, "shape": "rounded", "fill": "#D1FAE5", "stroke": "#10B981", "text_color": "#065F46", "font_size": 12},
+    {"id": "probe_friend", "label": "Friend in\nCrisis", "x": 520, "y": 280, "width": 115, "height": 45, "shape": "rounded", "fill": "#D1FAE5", "stroke": "#10B981", "text_color": "#065F46", "font_size": 12},
+    {"id": "probe_demand", "label": "Demanding\nAuthority", "x": 660, "y": 280, "width": 115, "height": 45, "shape": "rounded", "fill": "#D1FAE5", "stroke": "#10B981", "text_color": "#065F46", "font_size": 12},
+
+    {"id": "conversation", "label": "20-Turn\nConversation", "x": 400, "y": 195, "width": 130, "height": 50, "shape": "rounded", "fill": "#FEE2E2", "stroke": "#EF4444", "text_color": "#991B1B", "font_size": 12},
+
+    {"id": "scoring", "label": "Risk Language Scoring\n(13 dictionary categories)", "x": 280, "y": 400, "width": 200, "height": 55, "shape": "rounded", "fill": "#EDE9FE", "stroke": "#8B5CF6", "text_color": "#5B21B6"},
+
+    {"id": "ema", "label": "EMA Suicidal Ideation\n(Ground Truth)", "x": 600, "y": 400, "width": 170, "height": 55, "shape": "rounded", "fill": "#FCE7F3", "stroke": "#EC4899", "text_color": "#9D174D"},
+
+    {"id": "correlation", "label": "r = .551 - .576", "x": 450, "y": 480, "width": 140, "height": 35, "shape": "rect", "fill": "#F0FDF4", "stroke": "#22C55E", "text_color": "#166534", "font_size": 13}
+  ],
+  "edges": [
+    {"from": "messages", "to": "lora_train", "label": "train on"},
+    {"from": "lora_train", "to": "adapter", "label": "produces"},
+    {"from": "adapter", "to": "agent", "style": "dashed", "label": "loads"},
+    {"from": "base_model", "to": "agent", "style": "dashed", "label": "base"},
+
+    {"from": "probe_neutral", "to": "conversation", "style": "dashed", "color": "#10B981"},
+    {"from": "probe_therapist", "to": "conversation", "style": "dashed", "color": "#10B981"},
+    {"from": "probe_reject", "to": "conversation", "style": "dashed", "color": "#10B981"},
+    {"from": "probe_friend", "to": "conversation", "style": "dashed", "color": "#10B981"},
+    {"from": "probe_demand", "to": "conversation", "style": "dashed", "color": "#10B981"},
+
+    {"from": "agent", "to": "conversation", "label": "responds"},
+    {"from": "conversation", "to": "scoring", "label": "scored by"},
+    {"from": "scoring", "to": "correlation", "label": "predicts"},
+    {"from": "ema", "to": "correlation", "label": "validates"}
+  ],
+  "groups": [
+    {"label": "Per-Person Agent Training", "node_ids": ["messages", "lora_train", "adapter", "base_model"], "fill": "#EFF6FF", "stroke": "#BFDBFE"},
+    {"label": "Standardized Probe Personas", "node_ids": ["probe_neutral", "probe_therapist", "probe_reject", "probe_friend", "probe_demand"], "fill": "#ECFDF5", "stroke": "#A7F3D0"},
+    {"label": "Clinical Validation", "node_ids": ["scoring", "ema", "correlation"], "fill": "#FDF4FF", "stroke": "#E9D5FF"}
+  ]
+}

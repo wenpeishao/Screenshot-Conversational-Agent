@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520" font-family="Arial, Helvetica, sans-serif">
+  <rect width="900" height="520" fill="#FFFFFF"/>
+  <defs>
+    <marker id="arrow-default" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#555555"/>
+    </marker>
+    <marker id="arrow-c0" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#2563EB"/>
+    </marker>
+    <marker id="arrow-c1" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#10B981"/>
+    </marker>
+    <marker id="arrow-c2" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#7C3AED"/>
+    </marker>
+    <marker id="arrow-c3" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#EA580C"/>
+    </marker>
+    <marker id="arrow-c4" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#C62828"/>
+    </marker>
+    <marker id="arrow-c5" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#0D47A1"/>
+    </marker>
+    <marker id="arrow-c6" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#1B5E20"/>
+    </marker>
+    <marker id="arrow-c7" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#4A148C"/>
+    </marker>
+    <marker id="arrow-c8" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#BF360C"/>
+    </marker>
+    <marker id="arrow-c9" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 8 4, 0 8" fill="#37474F"/>
+    </marker>
+  </defs>
+  <rect x="15.0" y="27.5" width="825.0" height="95.0" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1" rx="8"/>
+  <text x="23.0" y="43.5" font-size="12" fill="#999999" font-weight="bold">Per-Person Agent Training</text>
+  <rect x="22.5" y="237.5" width="715.0" height="85.0" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1" rx="8"/>
+  <text x="30.5" y="253.5" font-size="12" fill="#999999" font-weight="bold">Probe Personas (Qwen3-8B, no LoRA)</text>
+  <rect x="160.0" y="352.5" width="545.0" height="165.0" fill="#FDF4FF" stroke="#E9D5FF" stroke-width="1" rx="8"/>
+  <text x="168.0" y="368.5" font-size="12" fill="#999999" font-weight="bold">Clinical Validation</text>
+  <path d="M 185.0,75.0 L 265.0,75.0" stroke="#555555" stroke-width="2" fill="none" marker-end="url(#arrow-default)"/>
+  <rect x="194.6" y="57.0" width="60.8" height="16" fill="#FFFFFF" rx="3" opacity="0.85"/>
+  <text x="225.0" y="69.0" font-size="11" fill="#777777" text-anchor="middle">train on</text>
+  <path d="M 395.0,75.0 L 480.0,75.0" stroke="#555555" stroke-width="2" fill="none" marker-end="url(#arrow-default)"/>
+  <rect x="407.1" y="57.0" width="60.8" height="16" fill="#FFFFFF" rx="3" opacity="0.85"/>
+  <text x="437.5" y="69.0" font-size="11" fill="#777777" text-anchor="middle">produces</text>
+  <path d="M 572.9,102.5 L 629.2,170.0" stroke="#555555" stroke-width="2" fill="none" marker-end="url(#arrow-default)" stroke-dasharray="8,4"/>
+  <rect x="580.5" y="118.2" width="41.0" height="16" fill="#FFFFFF" rx="3" opacity="0.85"/>
+  <text x="601.0" y="130.2" font-size="11" fill="#777777" text-anchor="middle">loads</text>
+  <path d="M 727.1,102.5 L 670.8,170.0" stroke="#555555" stroke-width="2" fill="none" marker-end="url(#arrow-default)" stroke-dasharray="8,4"/>
+  <rect x="681.8" y="118.2" width="34.4" height="16" fill="#FFFFFF" rx="3" opacity="0.85"/>
+  <text x="699.0" y="130.2" font-size="11" fill="#777777" text-anchor="middle">base</text>
+  <path d="M 157.5,263.7 L 335.0,213.4" stroke="#10B981" stroke-width="2" fill="none" marker-end="url(#arrow-c1)" stroke-dasharray="8,4"/>
+  <path d="M 282.4,257.5 L 352.9,220.0" stroke="#10B981" stroke-width="2" fill="none" marker-end="url(#arrow-c1)" stroke-dasharray="8,4"/>
+  <path d="M 385.3,257.5 L 394.1,220.0" stroke="#10B981" stroke-width="2" fill="none" marker-end="url(#arrow-c1)" stroke-dasharray="8,4"/>
+  <path d="M 488.2,257.5 L 435.3,220.0" stroke="#10B981" stroke-width="2" fill="none" marker-end="url(#arrow-c1)" stroke-dasharray="8,4"/>
+  <path d="M 602.5,261.2 L 465.0,216.2" stroke="#10B981" stroke-width="2" fill="none" marker-end="url(#arrow-c1)" stroke-dasharray="8,4"/>
+  <path d="M 585.0,195.0 L 465.0,195.0" stroke="#555555" stroke-width="2" fill="none" marker-end="url(#arrow-default)"/>
+  <rect x="494.6" y="177.0" width="60.8" height="16" fill="#FFFFFF" rx="3" opacity="0.85"/>
+  <text x="525.0" y="189.0" font-size="11" fill="#777777" text-anchor="middle">responds</text>
+  <path d="M 385.4,220.0 L 296.1,372.5" stroke="#555555" stroke-width="2" fill="none" marker-end="url(#arrow-default)"/>
+  <path d="M 338.4,427.5 L 412.8,462.5" stroke="#555555" stroke-width="2" fill="none" marker-end="url(#arrow-default)"/>
+  <rect x="345.2" y="427.0" width="60.8" height="16" fill="#FFFFFF" rx="3" opacity="0.85"/>
+  <text x="375.6" y="439.0" font-size="11" fill="#777777" text-anchor="middle">predicts</text>
+  <path d="M 548.4,427.5 L 482.8,462.5" stroke="#555555" stroke-width="2" fill="none" marker-end="url(#arrow-default)"/>
+  <rect x="481.9" y="427.0" width="67.4" height="16" fill="#FFFFFF" rx="3" opacity="0.85"/>
+  <text x="515.6" y="439.0" font-size="11" fill="#777777" text-anchor="middle">validates</text>
+  <rect x="35.0" y="47.5" width="150.0" height="55.0" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2" rx="8"/>
+  <text x="110.0" y="71.9" font-size="14" fill="#92400E" text-anchor="middle" font-weight="bold">Text Messages</text>
+  <text x="110.0" y="87.9" font-size="14" fill="#92400E" text-anchor="middle" font-weight="bold">(50-13K per person)</text>
+  <rect x="265.0" y="47.5" width="130.0" height="55.0" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" rx="8"/>
+  <text x="330.0" y="67.9" font-size="14" fill="#1E40AF" text-anchor="middle" font-weight="bold">LoRA</text>
+  <text x="330.0" y="83.9" font-size="14" fill="#1E40AF" text-anchor="middle" font-weight="bold">Fine-Tuning</text>
+  <text x="330.0" y="97.9" font-size="10" fill="#1E40AF" text-anchor="middle">(on Qwen3-8B)</text>
+  <rect x="480.0" y="47.5" width="140.0" height="55.0" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" rx="8"/>
+  <text x="550.0" y="71.9" font-size="14" fill="#1E40AF" text-anchor="middle" font-weight="bold">Per-Person</text>
+  <text x="550.0" y="87.9" font-size="14" fill="#1E40AF" text-anchor="middle" font-weight="bold">LoRA Adapter</text>
+  <rect x="680.0" y="47.5" width="140.0" height="55.0" fill="#E5E7EB" stroke="#6B7280" stroke-width="2" rx="0"/>
+  <text x="750.0" y="71.9" font-size="14" fill="#374151" text-anchor="middle" font-weight="bold">Qwen3-8B</text>
+  <text x="750.0" y="87.9" font-size="14" fill="#374151" text-anchor="middle" font-weight="bold">(Base Model)</text>
+  <rect x="585.0" y="170.0" width="130.0" height="50.0" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" rx="8"/>
+  <text x="650.0" y="191.9" font-size="14" fill="#1E40AF" text-anchor="middle" font-weight="bold">Per-Person</text>
+  <text x="650.0" y="207.9" font-size="14" fill="#1E40AF" text-anchor="middle" font-weight="bold">Agent</text>
+  <rect x="42.5" y="257.5" width="115.0" height="45.0" fill="#D1FAE5" stroke="#10B981" stroke-width="2" rx="8"/>
+  <text x="100.0" y="277.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Neutral</text>
+  <text x="100.0" y="291.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Acquaintance</text>
+  <rect x="182.5" y="257.5" width="115.0" height="45.0" fill="#D1FAE5" stroke="#10B981" stroke-width="2" rx="8"/>
+  <text x="240.0" y="277.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Supportive</text>
+  <text x="240.0" y="291.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Therapist</text>
+  <rect x="322.5" y="257.5" width="115.0" height="45.0" fill="#D1FAE5" stroke="#10B981" stroke-width="2" rx="8"/>
+  <text x="380.0" y="277.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Rejecting</text>
+  <text x="380.0" y="291.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Peer</text>
+  <rect x="462.5" y="257.5" width="115.0" height="45.0" fill="#D1FAE5" stroke="#10B981" stroke-width="2" rx="8"/>
+  <text x="520.0" y="277.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Friend in</text>
+  <text x="520.0" y="291.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Crisis</text>
+  <rect x="602.5" y="257.5" width="115.0" height="45.0" fill="#D1FAE5" stroke="#10B981" stroke-width="2" rx="8"/>
+  <text x="660.0" y="277.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Demanding</text>
+  <text x="660.0" y="291.2" font-size="12" fill="#065F46" text-anchor="middle" font-weight="bold">Authority</text>
+  <rect x="267.0" y="330.0" width="67.4" height="18" fill="#FFFFFF" rx="3" opacity="1.0" stroke="#DDDDDD" stroke-width="0.5"/>
+  <text x="300.7" y="343.0" font-size="11" fill="#777777" text-anchor="middle">scored by</text>
+  <rect x="335.0" y="170.0" width="130.0" height="50.0" fill="#FEE2E2" stroke="#EF4444" stroke-width="2" rx="8"/>
+  <text x="400.0" y="192.2" font-size="12" fill="#991B1B" text-anchor="middle" font-weight="bold">20-Turn</text>
+  <text x="400.0" y="206.2" font-size="12" fill="#991B1B" text-anchor="middle" font-weight="bold">Conversation</text>
+  <rect x="180.0" y="372.5" width="200.0" height="55.0" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2" rx="8"/>
+  <text x="280.0" y="396.9" font-size="14" fill="#5B21B6" text-anchor="middle" font-weight="bold">Risk Language Scoring</text>
+  <text x="280.0" y="412.9" font-size="14" fill="#5B21B6" text-anchor="middle" font-weight="bold">(13 dictionary categories)</text>
+  <rect x="515.0" y="372.5" width="170.0" height="55.0" fill="#FCE7F3" stroke="#EC4899" stroke-width="2" rx="8"/>
+  <text x="600.0" y="396.9" font-size="14" fill="#9D174D" text-anchor="middle" font-weight="bold">EMA Suicidal Ideation</text>
+  <text x="600.0" y="412.9" font-size="14" fill="#9D174D" text-anchor="middle" font-weight="bold">(Ground Truth)</text>
+  <rect x="380.0" y="462.5" width="140.0" height="35.0" fill="#F0FDF4" stroke="#22C55E" stroke-width="2" rx="0"/>
+  <text x="450.0" y="484.6" font-size="13" fill="#166534" text-anchor="middle" font-weight="bold">r = .551 - .576</text>
+</svg>

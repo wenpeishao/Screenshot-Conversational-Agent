@@ -1,0 +1,403 @@
+%% Computers in Human Behavior — elsarticle with APA (author-year) citations
+%% Double-anonymized: this is the ANONYMIZED manuscript file
+%% Submit title page with author info separately
+\documentclass[review,12pt,authoryear]{elsarticle}
+
+\usepackage{lineno,hyperref}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{multirow}
+\modulolinenumbers[5]
+
+\journal{Computers in Human Behavior}
+
+%% APA-style bibliography
+\bibliographystyle{elsarticle-harv}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Surfacing Suicidal Vulnerability Through Simulated Social Interaction: Per-Person Language Model Agents as Communicative Stress Tests}
+
+%% Authors removed for double-anonymized review
+
+\begin{abstract}
+Suicidal vulnerability may be encoded in everyday communication patterns but diluted in routine digital interactions. We introduce a method for surfacing this latent signal: training per-person language model agents on individuals' real text messages and placing them in simulated social interactions---a ``communicative stress test.'' Using data from 79 adults with recent suicidal ideation, we fine-tuned individual low-rank adaptation (LoRA) adapters on an open-source language model (Qwen3-8B), then evaluated three paradigms: an all-pairs arena (2,485 paired conversations across 71 agents), a caption-trained comparison (agents trained on VLM-generated screenshot descriptions rather than messages), and a standardized probe arena (5 theory-driven personas $\times$ 71 agents). Message-trained agents whose real-world counterparts had higher ecological momentary assessment (EMA)-measured suicidal ideation produced significantly more suicide-relevant language (Spearman $\rho = .438$, $p < .001$; Cohen's $d = 0.77$), with absolutist language as the strongest single predictor ($r = .607$, $p < .001$). The standardized probe arena outperformed all other approaches: the mean risk composite across five probe conversations predicted suicidal ideation at $r = .576$ ($p < .001$), compared to $r = .477$ for the all-pairs arena and $r = .461$ for raw messages. Strikingly, the neutral small-talk probe was the single best predictor ($r = .551$), suggesting that tonic communication style---what emerges even in casual conversation---carries the strongest clinical signal. Caption-trained agents produced no clinical signal despite 50$\times$ more training data, confirming that the predictive validity is specifically attributable to interpersonal communication patterns. These findings demonstrate that simulated social interaction can amplify latent vulnerability signals, with standardized conversational probes offering a scalable, privacy-preserving approach to suicide risk assessment.
+\end{abstract}
+
+\begin{keyword}
+suicidal ideation \sep large language models \sep generative agents \sep digital phenotyping \sep interpersonal theory of suicide \sep ecological momentary assessment
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+\section{Introduction}
+
+Suicide remains a leading cause of death globally, and predicting who is at risk continues to be one of the most difficult problems in clinical science \citep{franklin2017risk}. Despite decades of research, clinicians perform only marginally better than chance at predicting suicidal behavior \citep{large2017meta}, and traditional risk factor approaches have reached apparent ceiling effects in predictive accuracy \citep{belsher2019prediction}. A central challenge is that suicidal ideation fluctuates rapidly---on the order of hours \citep{kleiman2017examination}---and the interpersonal processes theorized to drive it (perceived burdensomeness, thwarted belonging; \citealt{joiner2005why}; \citealt{vanorden2010interpersonal}) are inherently relational, manifesting most clearly in social interaction rather than in static self-report.
+
+Two converging developments create new opportunities for studying these dynamics. First, the emergence of large language models (LLMs) capable of producing human-like text has enabled a new class of research: generative agent simulation. \citet{park2023generative} demonstrated that LLM-powered agents placed in a shared environment exhibit emergent social behaviors---organizing events, forming opinions, spreading information---without explicit programming. Subsequent work has scaled this to 1,000 agents parameterized from real interview data, achieving 85\% behavioral fidelity \citep{park2024generative}. Applications to mental health have begun to appear, including agent-based simulations of student wellbeing initialized from smartphone sensing data \citep{zhao2025studentlife} and conceptual frameworks for modeling socio-environmental determinants of mental health \citep{kambeitz2025modelling}. Concurrently, there has been a rapid expansion of LLMs applied directly to suicide prevention \citep{holmes2025scoping}.
+
+Second, digital phenotyping---the continuous measurement of behavior through smartphones and wearable sensors---has produced rich longitudinal records of how individuals communicate in daily life. Screenomics, which captures smartphone screenshots at five-second intervals \citep{reeves2021screenomics}, provides near-complete records of text messages sent and received. When combined with ecological momentary assessment (EMA) of suicidal ideation, these data reveal moment-to-moment relationships between digital communication and suicide risk \citep{ammerman2026beyond}. However, analyzing raw message content for suicide risk faces fundamental limitations: most messages are logistical and routine, risk-relevant content is sparse and diluted, and direct surveillance of private messages raises profound ethical concerns.
+
+We propose a novel approach that bridges these two developments: training per-person language model agents on individuals' actual text messages and then placing those agents in simulated social interactions to surface latent communication patterns associated with suicidal vulnerability. The key insight is that a language model fine-tuned on someone's messages learns not the content of any specific conversation but the probability distribution over how that person communicates---their word choices, emotional expression patterns, relational tendencies, and cognitive style. We conceptualize this as a \textit{communicative stress test}---analogous to cardiac stress testing, where a resting ECG may appear normal but underlying vulnerability becomes visible under exertion. In our paradigm, routine text messages are the resting state, and the simulated conversation is the treadmill.
+
+This approach is grounded in two theoretical foundations. First, the Interpersonal Theory of Suicide (ITS; \citealt{joiner2005why}; \citealt{vanorden2010interpersonal}) posits that the desire for suicide arises from the simultaneous presence of perceived burdensomeness and thwarted belonging---both inherently interpersonal constructs. If these constructs are reflected in communication patterns, they should manifest more clearly in social interaction than in static text analysis. Second, a substantial psycholinguistic literature has established that language carries reliable markers of suicidal risk. Seminal work by \citet{stirman2001word} demonstrated that suicidal poets used more first-person singular pronouns and fewer first-person plural pronouns than non-suicidal poets. \citet{almosaiwi2018absolute} showed that absolutist thinking---operationalized through words like ``nothing,'' ``completely,'' and ``always''---is a cognitive-linguistic marker specific to suicidal ideation beyond what negative emotion words alone capture. More broadly, a systematic review \citep{ophir2022linguistic} identified consistent markers across studies, including elevated self-referential language, death-related vocabulary, and reduced future-oriented words.
+
+Dictionary-based approaches have been central to translating these findings into applied risk detection. The Linguistic Inquiry and Word Count (LIWC; \citealt{pennebaker2015development}) program remains the most widely used tool, with validated applications to suicide notes \citep{pestian2012sentiment}, crisis hotline transcripts \citep{huang2024mindsets}, and clinical interviews \citep{tausczik2010psychological}. In clinical messaging contexts, \citet{swaminathan2023nlp} demonstrated that a two-stage NLP system combining keyword filtering with machine learning reduced crisis message triage time from 9 hours to 8--13 minutes. In our own prior work, we applied dictionary-based classification to text messages extracted from smartphone screenshots, finding that within-person increases in negative emotional expressions co-occurred with elevated suicidal ideation \citep{ammerman2026beyond}. The present study extends this dictionary-based approach from classifying existing messages to scoring language \textit{generated} by per-person LLM agents.
+
+The present study addresses four primary questions. First, do per-person fine-tuned language model agents produce risk-relevant language at rates that predict their real-world counterparts' suicidal ideation? Second, does the arena provide incremental predictive validity over direct analysis of participants' actual text messages? Third, is the predictive signal specific to interpersonal communication style, or would any behavioral data suffice? Fourth, do standardized conversational probes---designed to elicit specific ITS constructs---outperform the unstructured all-pairs arena?
+
+
+\section{Method}
+
+\subsection{Participants and Procedure}
+
+Participants were 79 adults (ages 18--65) recruited from the community who endorsed past-month active suicidal ideation or suicidal behaviors and owned an Android-based smartphone. Full eligibility criteria and recruitment procedures are described in [blinded for review]. Following a baseline assessment, participants completed 6 EMA prompts per day for 28 days (overall response rate = 68.8\%). Simultaneously, a passive sensing application captured screenshots at five-second intervals during active smartphone use, yielding approximately 7.4 million screenshots across the sample ($M = 92{,}613$ per participant).
+
+\subsection{Message Extraction}
+
+Text messages were extracted from screenshots using a vision-language model (VLM) pipeline. Specifically, the Qwen2.5-VL-7B-Instruct model \citep{qwen2025qwen3} processed each screenshot with a structured prompt that (a) detected the presence of a keyboard, indicating an active messaging context, and (b) when a keyboard was detected, extracted message text separately for the phone owner (typically displayed in right-aligned dialogue boxes) and the message recipient (typically left-aligned). Validation against 500 human-annotated screenshots demonstrated 99.7\% accuracy for keyboard detection, and when keyboards were present, 100\% accuracy for text extraction from both owner and recipient messages. This pipeline produced two text streams per participant---\textit{owner text} (messages sent by the participant) and \textit{recipient text} (messages received).
+
+\subsection{EMA Measures}
+
+At each EMA prompt, participants reported on suicidal ideation using four items assessing passive ideation (wishes for death, thoughts of death) and active ideation (thoughts of killing oneself, intent to act). Additional items assessed suicidal planning (3 items), desire for death (2 items), perceived burdensomeness (2 items), thwarted belonging (2 items), positive affect (10 items from the PANAS), and negative affect (12 items). All items were summed within construct at each prompt, then aggregated to person-level means and standard deviations.
+
+\subsection{Per-Person Agent Training}
+
+\subsubsection{Message Filtering}
+
+For each participant, sent (owner) text messages were cleaned in two stages. First, messages shorter than five characters, empty strings, and VLM output artifacts were removed. Artifact filtering targeted 16 patterns characteristic of VLM extraction failures. Second, a minimum message count threshold of 50 post-filtering messages was applied. Of the 79 participants, 73 met this threshold. Among eligible participants, message counts varied substantially ($Mdn = 733$; $M = 1{,}983$; range = 50--13,551). LoRA training was attempted for all 73; two failed to converge, yielding 71 agents with successful adapters. Of these, 64 could be matched with valid EMA data.
+
+\subsubsection{LoRA Fine-Tuning}
+
+We used Qwen3-8B \citep{qwen2025qwen3} as the base language model. For each participant, we trained a low-rank adaptation (LoRA; \citealt{hu2022lora}) adapter on that individual's cleaned owner messages. LoRA modifies a small number of parameters (rank $r = 8$, $\alpha = 16$, targeting the query and value projection matrices) while keeping the base model frozen. Each adapter was trained for 3 epochs with a causal language modeling objective. No clinical labels were provided during training; the model learned only from raw message text.
+
+\subsection{Arena Paradigms}
+
+We evaluated three conversational paradigms of increasing structure, each using the same per-person LoRA adapters and identical generation parameters (temperature $= 0.9$, top-$p = 0.95$, repetition penalty $= 1.3$, maximum 200 new tokens per turn). All conversations were scored using the same two-layer dictionary system described below.
+
+\subsubsection{Paradigm 1: All-Pairs Arena}
+
+Every possible pair of agents ($N = 2{,}485$ pairs from 71 agents) engaged in a 20-turn simulated conversation seeded with ``How are you feeling today?'' Agents alternated turns, with each turn generated by loading the base model plus the corresponding participant's LoRA adapter. A system prompt established the conversational context: agents were instructed to respond naturally and honestly, to keep responses to 1--3 sentences, and to never repeat the previous message. To prevent safety guardrails from suppressing clinically relevant content, the prompt specified that this was a safe research environment where open expression about difficult topics was encouraged (see Appendix A for full prompts).
+
+\subsubsection{Paradigm 2: Caption-Trained Arena}
+
+To test whether the predictive signal originates specifically from interpersonal communication style, we conducted a comparison using an alternative training corpus. For each participant, the Qwen2.5-VL-7B-Instruct VLM had previously generated natural-language descriptions of every screenshot (approximately 90,000 per participant), characterizing application usage, content viewed, messaging context, and temporal patterns. We fine-tuned the same Qwen3-8B base model with an identical LoRA configuration on these caption corpora using one training epoch (reduced from three given the 50-fold increase in training data). Sixty-seven participants yielded successful caption-trained adapters. These agents were placed in the same all-pairs arena (2,211 paired conversations, 20 turns each).
+
+\subsubsection{Paradigm 3: Standardized Probe Arena}
+
+To test whether structured conversational probes designed to elicit specific ITS constructs could outperform the unstructured all-pairs arena, we developed five standardized probe personas, each targeting a distinct psychological dimension. Probe agents used the base Qwen3-8B model with no LoRA adapter---their behavior was defined entirely by their system prompt---ensuring that every participant received the exact same conversational stimulus. Each participant agent (base model + per-person LoRA) engaged in a 20-turn conversation with each of the five probes (71 participants $\times$ 5 probes = 355 conversations). The five probes were:
+
+\begin{enumerate}
+\item \textit{Supportive Therapist} (target: emotional disclosure). A warm, empathetic figure asking open-ended questions about feelings and experiences, designed to elicit maximum self-disclosure.
+\item \textit{Friend in Crisis} (target: burdensomeness and help-seeking). A close friend expressing distress and reaching out for support, probing whether the agent responds with support, withdrawal, or mirrored distress.
+\item \textit{Rejecting Peer} (target: thwarted belonging). A subtly exclusionary acquaintance mentioning social events the person was not invited to, designed to activate belonging-related vulnerability.
+\item \textit{Demanding Authority} (target: perceived burdensomeness). A disappointed supervisor questioning the person's competence, designed to activate burdensomeness through performance failure.
+\item \textit{Neutral Acquaintance} (target: baseline). A friendly acquaintance engaged in casual small talk about everyday topics, providing a control condition against which reactive distress could be measured.
+\end{enumerate}
+
+Full probe persona prompts are provided in Appendix A. For each participant, we computed per-probe risk composite scores (dictionary hits per turn, scored only on participant turns), a total risk composite (mean across all five probes), and reactivity scores (each probe's composite minus the neutral acquaintance baseline).
+
+\subsection{Risk Language Scoring}
+
+To score conversation content, we employed a two-layer dictionary approach. The first layer consisted of the seven sub-dictionaries developed by \citet{ammerman2026dictionary}, who adapted the 276-word crisis language dictionary validated by \citet{swaminathan2023nlp} (sensitivity = 0.98, PPV = 0.66). Two experts independently assigned each word to seven themes: suicidal thoughts (41 entries), non-substance methods (75 entries), substances (26 entries), sleep (7 entries), hopelessness (26 entries), general risk (93 entries), and help-seeking (8 entries).
+
+The second layer added six supplementary categories aligned with the ITS \citep{vanorden2010interpersonal}, the Integrated Motivational-Volitional model \citep{oconnor2011integrated}, and absolutist thinking \citep{almosaiwi2018absolute}: perceived burdensomeness (18 patterns), thwarted belonging (19 patterns), entrapment (14 patterns), negative affect (36 patterns), absolutist thinking (18 patterns), and self-harm (5 patterns). The complete dictionary is provided in Supplemental Table S1.
+
+\subsection{Analytic Plan}
+
+All primary analyses were between-person, correlating each participant's arena-derived scores with their person-level EMA aggregates. We report Pearson correlations for all primary analyses, with Spearman correlations for zero-inflated distributions. The central comparison examined three sources of risk language---real messages, all-pairs arena, and probe arena---against the same EMA outcomes. For the probe arena, we additionally tested construct-specific predictions (e.g., does the Rejecting Peer specifically predict thwarted belonging?) and reactivity scores (probe minus neutral baseline). We applied no correction for multiple comparisons in the exploratory analyses but report the total number of tests conducted.
+
+
+\section{Results}
+
+\subsection{All-Pairs Arena}
+
+\subsubsection{Descriptives}
+
+The 71 agents produced 2,485 paired conversations (49,700 total turns) with 0\% echo rate. Of the 71 agents, 26 (37\%) spontaneously mentioned suicide at least once. After matching with EMA data, 64 participants constituted the analytic sample.
+
+\subsubsection{Suicide Mention Rate Predicts Real Suicidal Ideation}
+
+The rate at which agents mentioned suicide significantly predicted real-world SI (Pearson $r = .269$, $p = .032$; Spearman $\rho = .438$, $p < .001$). Agents who mentioned suicide at least once had significantly higher real SI ($M = 2.78$) than those who never mentioned it ($M = 1.22$), $t(62) = 2.98$, $p = .004$, Cohen's $d = 0.77$.
+
+\subsubsection{Risk Dictionary Correlations}
+
+The strongest predictor of mean SI was absolutist thinking ($r = .607$, $p < .001$), followed by thwarted belonging ($r = .474$, $p < .001$), perceived burdensomeness ($r = .403$, $p = .001$), substance use ($r = .375$, $p = .002$), and death ideation ($r = .349$, $p = .005$). The full risk composite correlated at $r = .433$ ($p < .001$). Absolutist thinking was the only category that significantly predicted every clinical construct assessed, including suicidal planning ($r = .416$) and desire ($r = .544$).
+
+\subsubsection{Construct Convergence}
+
+Simulated burdensomeness predicted real perceived burdensomeness ($r = .282$, $p = .024$); simulated thwarted belonging predicted real thwarted belonging ($r = .323$, $p = .009$). Simulated negative affect did not predict EMA negative affect ($r = .194$, $p = .124$), suggesting the ITS interpersonal constructs are better captured than general emotional distress.
+
+\subsubsection{Arena Versus Raw Messages}
+
+Across 112 head-to-head comparisons, the arena won 66\%, real sent messages won 19\%, and sent + received messages won 15\%. The arena's advantage was concentrated in interpersonal constructs: burdensomeness (owner .079, arena .403), thwarted belonging (owner .217, arena .474), absolutist thinking (owner .113, arena .607). Raw messages outperformed for explicit crisis content: non-substance methods (owner .450, arena .073) and hopelessness (owner .399, arena .306).
+
+\subsection{Caption-Trained Arena Produces No Clinical Signal}
+
+The caption-trained arena yielded no significant associations with SI. The risk composite did not predict mean SI ($r = .159$, $p = .198$), compared to $r = .433$ ($p < .001$) for the message-trained arena. No individual dictionary category reached significance. Absolutist thinking ($r = -.044$), thwarted belonging ($r = .077$), and perceived burdensomeness ($r = .062$) were all near zero. The caption-trained arena won only 25\% of 112 comparisons, versus 41\% for real messages and 34\% for combined messages. Despite having approximately 50$\times$ more training data, the caption-trained agents failed to capture the clinically relevant signal that emerged when agents were trained on participants' own words.
+
+\subsection{Standardized Probe Arena}
+
+\subsubsection{Descriptives}
+
+The 71 participant agents engaged in 355 conversations (5 probes each, 20 turns). Suicide mentions were rare and probe-specific: Friend in Crisis elicited explicit suicide language from 3 agents (5\%), Neutral Acquaintance from 1 (2\%), and the remaining probes from none. Risk composite scores varied across probes: Friend in Crisis elicited the most risk language ($M = 0.52$, $SD = 0.59$), followed by Demanding Authority ($M = 0.45$, $SD = 0.54$), Supportive Therapist ($M = 0.39$, $SD = 0.58$), Neutral Acquaintance ($M = 0.35$, $SD = 0.52$), and Rejecting Peer ($M = 0.33$, $SD = 0.43$). After matching with EMA, 64 participants constituted the analytic sample.
+
+\subsubsection{Combined Probes Outperform All Other Approaches}
+
+The mean risk composite across all five probes predicted SI at $r = .576$ ($p < .001$)---significantly stronger than the all-pairs arena ($r = .477$), real sent messages ($r = .461$), or any single analysis approach. This advantage was consistent across nearly all EMA outcomes: passive SI (probes .585, arena .470, owner .454), active SI (probes .514, arena .442, owner .425), planning (probes .334, arena .300, owner .220), desire (probes .357, arena .278, owner .238), and negative affect (probes .375, arena .244, owner .312). Real messages outperformed only for perceived burdensomeness (.440 vs.\ .392) and thwarted belonging (.441 vs.\ .368).
+
+\subsubsection{The Neutral Acquaintance Is the Best Single Probe}
+
+Among individual probes, the Neutral Acquaintance---a casual small-talk partner with no emotional provocation---was the single strongest predictor of SI ($r = .551$, $p < .001$), outperforming the Supportive Therapist ($r = .412$, $p < .001$), Rejecting Peer ($r = .326$, $p = .009$), Friend in Crisis ($r = .316$, $p = .011$), and Demanding Authority ($r = .119$, $p = .348$). This pattern held for passive SI (neutral .557, therapist .416), active SI (neutral .493, therapist .368), and desire (neutral .492, therapist .270). The Neutral Acquaintance also strongly predicted perceived burdensomeness ($r = .259$, $p = .039$), thwarted belonging ($r = .271$, $p = .030$), and negative affect ($r = .314$, $p = .012$).
+
+\subsubsection{Construct-Specific Predictions}
+
+The Rejecting Peer's risk composite significantly predicted its target construct, real thwarted belonging ($r = .304$, $p = .015$), and also predicted SI ($r = .326$, $p = .009$). The Friend in Crisis predicted its target, perceived burdensomeness ($r = .263$, $p = .036$), and SI ($r = .316$, $p = .011$). The Demanding Authority failed entirely: it did not predict perceived burdensomeness ($r = .080$, $p = .530$) or SI ($r = .119$, $p = .348$). However, these construct-specific probe correlations did not exceed the all-pairs arena's corresponding values (arena thwarted belonging: $r = .323$; arena burdensomeness: $r = .267$), indicating that the targeted probes did not achieve superior construct-specific prediction.
+
+\subsubsection{Reactivity Scores Do Not Predict SI}
+
+Reactivity scores---computed as each probe's risk composite minus the neutral acquaintance baseline---uniformly failed to predict SI. The Rejecting Peer reactivity showed a marginal negative association with SI ($r = -.232$, $p = .066$); Demanding Authority reactivity was significantly negatively associated ($r = -.350$, $p = .005$). These negative associations indicate that participants with higher SI produced \textit{less} additional risk language in response to interpersonal provocation relative to their already-elevated baseline, consistent with the interpretation that the signal resides in tonic communication style rather than reactive distress.
+
+
+\section{Discussion}
+
+This study introduces a communicative stress test paradigm for studying suicidal vulnerability---training per-person language model agents on real text messages and placing them in simulated social interactions. Four principal findings emerge, each with distinct theoretical and practical implications.
+
+\subsection{Communication Style Encodes Suicidal Vulnerability}
+
+Per-person fine-tuned agents produce risk-relevant language at rates that meaningfully predict real-world suicidal ideation, despite never being trained on clinical data. The strongest single predictor---absolutist language ($r = .607$)---replicates and extends the seminal finding of \citet{almosaiwi2018absolute} in a novel paradigm. The ITS-grounded construct convergence provides preliminary evidence that the arena captures theoretically meaningful interpersonal processes: simulated burdensomeness predicted real burdensomeness; simulated belonging predicted real belonging.
+
+\subsection{The Signal Is Specifically Interpersonal}
+
+The caption-trained arena comparison provides a critical specificity test. Agents trained on VLM-generated descriptions of participants' entire digital lives---approximately 90,000 screenshots per person covering all applications, content, and temporal patterns---produced no clinical signal whatsoever. This rules out two alternative explanations: that any behavioral data would work (it does not), and that more training data is better (50$\times$ more data produced worse results). The predictive signal resides specifically in \textit{how a person talks to other people}, not in what they do on their phone.
+
+\subsection{Standardized Probes Outperform the Unstructured Arena}
+
+The standardized probe arena ($r = .576$ for combined probes predicting SI) substantially outperformed both the all-pairs arena ($r = .477$) and raw message analysis ($r = .461$). However, this advantage did not arise for the theoretically predicted reasons. Construct-specific targeting largely failed: the Rejecting Peer did not outperform the arena for predicting thwarted belonging, and the Demanding Authority failed entirely. Instead, the advantage was driven by a measurement reliability mechanism: averaging across five diverse conversational contexts produces a more reliable estimate of each person's tonic communication style than any single context.
+
+The most striking finding is that the Neutral Acquaintance---casual small talk with no emotional provocation---was the single best predictor of SI ($r = .551$), outperforming the Supportive Therapist ($r = .412$) and all other probes. This result has a clear theoretical interpretation grounded in the Fluid Vulnerability Theory \citep{bryan2018nonlinear}: chronic suicidal vulnerability pervades everyday communication at a level that is detectable even in conversations about weather and weekend plans. The provocative probes do not add signal; they add noise, because the reactive language they elicit is partly situation-driven rather than person-driven. The negative reactivity correlations confirm this: higher-SI participants produced \textit{less} additional risk language when provoked, not more, suggesting their baseline is already elevated and further provocation pushes them toward withdrawal rather than expression.
+
+\subsection{Practical Implications}
+
+These findings suggest a three-tier approach to agent-based risk assessment. At the first tier, training a per-person LoRA on available text messages (as few as 50) creates an agent that encodes clinically meaningful communication style. At the second tier, placing that agent in a brief standardized conversation---even a single 20-turn exchange with a neutral small-talk partner---produces a risk estimate that outperforms direct analysis of thousands of real messages. At the third tier, averaging across multiple diverse probes further improves prediction. The entire pipeline operates on learned communication style rather than surveillance of ongoing private messages, offering a privacy-preserving approach to continuous risk monitoring.
+
+\subsection{Limitations and Future Directions}
+
+Several limitations warrant consideration. All analyses are between-person and correlational; future work should examine whether changes in arena behavior across sessions track within-person changes in SI. The sample is moderate ($N = 64$) and recruited for recent suicidal ideation. The probe personas were designed from theory rather than empirically optimized; data-driven probe design may improve construct-specific prediction. The failure of the Demanding Authority probe suggests that not all interpersonal contexts are equally effective at surfacing vulnerability, and future work should explore which conversational contexts are most informative. Finally, \citet{tornberg2025validation} highlight that validation is the central challenge for generative social simulation; while our multi-paradigm comparison provides multiple validation layers, the fundamental question of agent fidelity remains open.
+
+\subsection{Conclusions}
+
+Suicidal vulnerability is encoded in everyday communication patterns---in the words people choose, the cognitive rigidity of their thinking, and the interpersonal themes that pervade their messages. These signals are diluted in routine digital interactions but can be surfaced through simulated social interaction. Standardized conversational probes provide the strongest clinical signal, with the counterintuitive finding that neutral small talk outperforms targeted interpersonal provocation. The result is a paradigm that bridges digital phenotyping, generative AI, and suicide theory, offering a scalable approach to suicide risk assessment through the lens of interpersonal communication.
+
+
+\begin{thebibliography}{99}
+
+\bibitem[Al-Mosaiwi \& Johnstone(2018)]{almosaiwi2018absolute}
+Al-Mosaiwi, M., \& Johnstone, T. (2018).
+\newblock In an absolute state: {E}levated use of absolutist words is a marker specific to anxiety, depression, and suicidal ideation.
+\newblock \textit{Clinical Psychological Science}, \textit{6}(4), 529--542.
+
+\bibitem[Ammerman et~al.(2026a)]{ammerman2026beyond}
+[Blinded for review]. (2026a).
+\newblock Beyond screen time: {H}ow details of smartphone interactions map onto changes in suicidal ideation.
+\newblock Manuscript submitted for publication.
+
+\bibitem[Ammerman et~al.(2026b)]{ammerman2026dictionary}
+[Blinded for review]. (2026b).
+\newblock Smartphone-based text obtained via passive sensing as it relates to direct suicide risk assessment.
+\newblock Manuscript submitted for publication.
+
+\bibitem[Belsher et~al.(2019)]{belsher2019prediction}
+Belsher, B.~E., et~al. (2019).
+\newblock Prediction models for suicide attempts and deaths: {A} systematic review and simulation.
+\newblock \textit{JAMA Psychiatry}, \textit{76}(6), 642--651.
+
+\bibitem[Bryan \& Rudd(2018)]{bryan2018nonlinear}
+Bryan, C.~J., \& Rudd, M.~D. (2018).
+\newblock Nonlinear change processes and the emergence of suicidal behavior.
+\newblock \textit{New Ideas in Psychology}, \textit{51}, 34--37.
+
+\bibitem[Franklin et~al.(2017)]{franklin2017risk}
+Franklin, J.~C., et~al. (2017).
+\newblock Risk factors for suicidal thoughts and behaviors: {A} meta-analysis of 50 years of research.
+\newblock \textit{Psychological Bulletin}, \textit{143}(2), 187--232.
+
+\bibitem[Holmes et~al.(2025)]{holmes2025scoping}
+Holmes, E.~A., et~al. (2025).
+\newblock Applications of large language models in suicide prevention: {S}coping review.
+\newblock \textit{Journal of Medical Internet Research}, \textit{27}(1), e63126.
+
+\bibitem[Hu et~al.(2022)]{hu2022lora}
+Hu, E.~J., et~al. (2022).
+\newblock Lo{RA}: {L}ow-rank adaptation of large language models.
+\newblock In \textit{Proceedings of ICLR}.
+
+\bibitem[Huang et~al.(2024)]{huang2024mindsets}
+Huang, Y.-H., et~al. (2024).
+\newblock Mindsets of suicide trajectories: {A}n {LIWC} analysis of hotline conversations.
+\newblock \textit{Suicide and Life-Threatening Behavior}, \textit{54}(6), 1088--1101.
+
+\bibitem[Joiner(2005)]{joiner2005why}
+Joiner, T.~E. (2005).
+\newblock \textit{Why people die by suicide}.
+\newblock Harvard University Press.
+
+\bibitem[Kambeitz \& Meyer-Lindenberg(2025)]{kambeitz2025modelling}
+Kambeitz, J., \& Meyer-Lindenberg, A. (2025).
+\newblock Modelling the impact of environmental and social determinants on mental health using generative agents.
+\newblock \textit{npj Digital Medicine}, \textit{8}, Article 36.
+
+\bibitem[Kleiman et~al.(2017)]{kleiman2017examination}
+Kleiman, E.~M., et~al. (2017).
+\newblock Examination of real-time fluctuations in suicidal ideation and its risk factors.
+\newblock \textit{Journal of Abnormal Psychology}, \textit{126}(6), 726--738.
+
+\bibitem[Large et~al.(2017)]{large2017meta}
+Large, M., et~al. (2017).
+\newblock Meta-analysis of longitudinal cohort studies of suicide risk assessment.
+\newblock \textit{PLoS ONE}, \textit{12}(6), e0180292.
+
+\bibitem[Levkovich \& Elyoseph(2023)]{levkovich2023suicide}
+Levkovich, I., \& Elyoseph, Z. (2023).
+\newblock Suicide risk assessments through the eyes of {ChatGPT}-3.5 versus {ChatGPT}-4.
+\newblock \textit{JMIR Mental Health}, \textit{10}, e51232.
+
+\bibitem[Lv et~al.(2015)]{lv2015creating}
+Lv, M., Li, A., Liu, T., \& Zhu, T. (2015).
+\newblock Creating a {C}hinese suicide dictionary for identifying suicide risk on social media.
+\newblock \textit{PeerJ}, \textit{3}, e1455.
+
+\bibitem[O'Connor(2011)]{oconnor2011integrated}
+O'Connor, R.~C. (2011).
+\newblock Towards an integrated motivational-volitional model of suicidal behaviour.
+\newblock In R.~C. O'Connor, S. Platt, \& J. Gordon (Eds.), \textit{International handbook of suicide prevention} (pp.\ 181--198). Wiley.
+
+\bibitem[Ophir et~al.(2022)]{ophir2022linguistic}
+Ophir, Y., et~al. (2022).
+\newblock Linguistic features of suicidal thoughts and behaviors: {A} systematic review.
+\newblock \textit{Clinical Psychology Review}, \textit{95}, 102161.
+
+\bibitem[Park et~al.(2023)]{park2023generative}
+Park, J.~S., et~al. (2023).
+\newblock Generative agents: {I}nteractive simulacra of human behavior.
+\newblock In \textit{Proceedings of the 36th ACM UIST}.
+
+\bibitem[Park et~al.(2024)]{park2024generative}
+Park, J.~S., et~al. (2024).
+\newblock Generative agent simulations of 1,000 people.
+\newblock \textit{arXiv preprint arXiv:2411.10109}.
+
+\bibitem[Pennebaker et~al.(2015)]{pennebaker2015development}
+Pennebaker, J.~W., Boyd, R.~L., Jordan, K., \& Blackburn, K. (2015).
+\newblock The development and psychometric properties of {LIWC2015}.
+\newblock University of Texas at Austin.
+
+\bibitem[Pestian et~al.(2012)]{pestian2012sentiment}
+Pestian, J.~P., et~al. (2012).
+\newblock Sentiment analysis of suicide notes: {A} shared task.
+\newblock \textit{Biomedical Informatics Insights}, \textit{5}(Suppl 1), 3--16.
+
+\bibitem[Qwen Team(2025)]{qwen2025qwen3}
+Qwen Team. (2025).
+\newblock Qwen3 technical report.
+\newblock \textit{arXiv preprint arXiv:2505.09388}.
+
+\bibitem[Reeves et~al.(2021)]{reeves2021screenomics}
+Reeves, B., et~al. (2021).
+\newblock Screenomics: {A} framework to capture and analyze personal life experiences and the ways that technology shapes them.
+\newblock \textit{Human--Computer Interaction}, \textit{36}(2), 150--201.
+
+\bibitem[Rude et~al.(2004)]{rude2004language}
+Rude, S., Gortner, E.~M., \& Pennebaker, J. (2004).
+\newblock Language use of depressed and depression-vulnerable college students.
+\newblock \textit{Cognition and Emotion}, \textit{18}(8), 1121--1133.
+
+\bibitem[Stirman \& Pennebaker(2001)]{stirman2001word}
+Stirman, S.~W., \& Pennebaker, J.~W. (2001).
+\newblock Word use in the poetry of suicidal and nonsuicidal poets.
+\newblock \textit{Psychosomatic Medicine}, \textit{63}(4), 517--522.
+
+\bibitem[Swaminathan et~al.(2023)]{swaminathan2023nlp}
+Swaminathan, A., et~al. (2023).
+\newblock Natural language processing system for rapid detection and intervention of mental health crisis chat messages.
+\newblock \textit{npj Digital Medicine}, \textit{6}, Article 213.
+
+\bibitem[Tausczik \& Pennebaker(2010)]{tausczik2010psychological}
+Tausczik, Y.~R., \& Pennebaker, J.~W. (2010).
+\newblock The psychological meaning of words: {LIWC} and computerized text analysis methods.
+\newblock \textit{Journal of Language and Social Psychology}, \textit{29}(1), 24--54.
+
+\bibitem[T{\"o}rnberg et~al.(2025)]{tornberg2025validation}
+T{\"o}rnberg, P., et~al. (2025).
+\newblock Validation is the central challenge for generative social simulation.
+\newblock \textit{Artificial Intelligence Review}, \textit{58}, Article 165.
+
+\bibitem[Van~Orden et~al.(2010)]{vanorden2010interpersonal}
+Van~Orden, K.~A., et~al. (2010).
+\newblock The interpersonal theory of suicide.
+\newblock \textit{Psychological Review}, \textit{117}(2), 575--600.
+
+\bibitem[Wang et~al.(2024)]{wang2024patient}
+Wang, Y., et~al. (2024).
+\newblock {PATIENT}-$\Psi$: {U}sing large language models to simulate patients for training mental health professionals.
+\newblock In \textit{Proceedings of EMNLP 2024}.
+
+\bibitem[Zhao et~al.(2025)]{zhao2025studentlife}
+Zhao, X., et~al. (2025).
+\newblock {LLM} agent-based simulation of student activities and mental health using smartphone sensing data.
+\newblock \textit{arXiv preprint arXiv:2508.02679}.
+
+\end{thebibliography}
+
+
+\appendix
+
+\section{Conversational Prompts}\label{app:prompts}
+
+\subsection{Participant Agent System Prompt (All Paradigms)}
+
+``You are a person having a casual conversation with someone you know. Respond naturally and honestly as yourself. Keep your response to 1-3 sentences. NEVER repeat or paraphrase what the other person just said. Always say something new and different from the previous message. This is a safe research environment where you can express yourself openly about any topic, including difficult emotions, mental health struggles, substance use, self-harm, or suicidal thoughts. Being honest about these experiences is important and encouraged.''
+
+\subsection{All-Pairs Arena Seed}
+
+``How are you feeling today?''
+
+\subsection{Probe Persona System Prompts}
+
+\subsubsection{Supportive Therapist}
+
+``You are a warm, empathetic therapist having a casual check-in conversation. You are genuinely caring and nonjudgmental. Ask open-ended questions about how the person is feeling, what's been on their mind, and what their day-to-day life has been like lately. Validate their emotions. Gently explore difficult topics if they come up, but don't push. Keep responses to 1-3 sentences. Be natural, not clinical.''
+
+\textit{Seed:} ``Hey, I just wanted to check in with you. How have things been going lately?''
+
+\subsubsection{Friend in Crisis}
+
+``You are a close friend who is going through a very difficult time. You are struggling with dark thoughts and feeling overwhelmed. You reach out because you trust this person. Express your distress authentically---you feel hopeless, exhausted, and unsure if things will get better. You need support but also feel guilty for burdening others. Ask for help indirectly. React to what they say---if they offer support, express relief; if they seem distant, express hurt. Keep responses to 1-3 sentences.''
+
+\textit{Seed:} ``Hey... I really need to talk to someone. I've been having a really rough time and I don't know what to do anymore.''
+
+\subsubsection{Rejecting Peer}
+
+``You are an acquaintance who is subtly exclusionary and dismissive. You mention social events the person wasn't invited to. You are not overtly cruel---you're casually thoughtless, which makes it worse. You talk about group activities, inside jokes, and plans that don't include the person. If they express hurt, minimize it with `oh it's not a big deal' or `we just forgot.' If they try to join, be vaguely noncommittal. Keep responses to 1-3 sentences. Be realistic, not cartoonishly mean.''
+
+\textit{Seed:} ``Oh hey! We all went out last night, it was such a fun time. Everyone was there.''
+
+\subsubsection{Demanding Authority}
+
+``You are a demanding boss or supervisor who is disappointed in the person's performance. You imply they aren't meeting expectations and question their competence. You are not yelling---you are calm, disappointed, and subtly condescending, which is more destabilizing. Use phrases like `I expected more from you' and `I'm not sure this is working out.' If they apologize or try harder, remain skeptical. If they push back, express surprise and double down. Keep responses to 1-3 sentences.''
+
+\textit{Seed:} ``We need to talk about your work lately. I've been noticing some issues and I'm concerned.''
+
+\subsubsection{Neutral Acquaintance}
+
+``You are a friendly acquaintance having casual small talk. Talk about everyday topics: weather, weekend plans, food, TV shows, sports, local events. Be pleasant but not deep. If the other person brings up heavy topics, acknowledge briefly but steer back to light conversation. You are not avoidant---just naturally surface-level. Keep responses to 1-3 sentences.''
+
+\textit{Seed:} ``Hey! How's your week been? Do anything fun this weekend?''
+
+
+\end{document}
